@@ -1,0 +1,15 @@
+data/*.csv
+data/*.xlsx
+data/*.json
+
+saved_models/*.joblib
+saved_models/*.pkl
+saved_models/*.pickle
+
+__pycache__/
+**/__pycache__/
+*.pyc
+
+venv/
+.venv/
+.env

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scam & Fraud Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Fraunces:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --beige: #f2e7d5;
+    --beige-2: #e9d9bf;
+    --paper: #fbf3e6;
+    --brown-1: #3b2a1e;
+    --brown-2: #5a4130;
+    --brown-3: #8a6a4a;
+    --green-1: #38513f;
+    --green-2: #4f7358;
+    --green-3: #8faa7c;
+    --ink: #2c2115;
+    --danger: #a4402c;
+    --safe: #3f6b46;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    color: var(--ink);
+    margin: 0;
+    padding: 50px 18px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    overflow-x: hidden;
+    background: var(--beige);
+    background-image:
+      radial-gradient(circle at 8% 12%, rgba(143,170,124,0.25) 0, transparent 40%),
+      radial-gradient(circle at 92% 88%, rgba(90,65,48,0.18) 0, transparent 45%),
+      repeating-linear-gradient(0deg, rgba(59,42,30,0.025) 0px, rgba(59,42,30,0.025) 1px, transparent 1px, transparent 3px);
+  }
+
+  /* torn-paper / hand-made decorative blobs */
+  .blob {
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+  .blob svg { display: block; width: 100%; height: 100%; }
+  .blob.leaf1 { width: 130px; top: 40px; left: -20px; transform: rotate(-18deg); animation: sway 7s ease-in-out infinite; }
+  .blob.leaf2 { width: 100px; bottom: 60px; right: -10px; transform: rotate(24deg); animation: sway 9s ease-in-out infinite reverse; }
+  .blob.ring { width: 90px; top: 52%; right: 6%; opacity: 0.35; animation: spinSlow 22s linear infinite; }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-18deg) translateY(0); }
+    50% { transform: rotate(-12deg) translateY(-14px); }
+  }
+  @keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 580px;
+    width: 100%;
+    animation: riseIn 0.7s cubic-bezier(.19,1,.22,1) both;
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(20px) rotate(-0.4deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0deg); }
+  }
+
+  .card {
+    background: var(--paper);
+    border: 3px solid var(--brown-1);
+    border-radius: 26px 30px 24px 32px / 30px 24px 32px 26px;
+    padding: 38px 34px;
+    box-shadow:
+      8px 8px 0px 0px var(--brown-1),
+      0 30px 50px rgba(59,42,30,0.18);
+    position: relative;
+    transform: rotate(-0.3deg);
+  }
+
+  /* washi-tape corner accents */
+  .tape {
+    position: absolute;
+    width: 90px; height: 30px;
+    background: var(--green-3);
+    opacity: 0.85;
+    top: -14px; left: 34px;
+    transform: rotate(-6deg);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    border-radius: 2px;
+  }
+  .tape::before, .tape::after {
+    content: "";
+    position: absolute;
+    width: 6px; top: 0; bottom: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.35) 3px, rgba(255,255,255,0.35) 5px);
+  }
+  .tape::before { left: 0; }
+  .tape::after { right: 0; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+    margin-top: 10px;
+  }
+
+  .brand .icon {
+    width: 50px; height: 50px;
+    border-radius: 50% 48% 52% 46% / 48% 52% 46% 54%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    background: var(--green-2);
+    border: 3px solid var(--brown-1);
+    box-shadow: 3px 3px 0 var(--brown-1);
+    flex-shrink: 0;
+    transform: rotate(-4deg);
+    animation: wiggle 4s ease-in-out infinite;
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    color: var(--brown-1);
+    line-height: 1.15;
+  }
+
+  h1 .accent { color: var(--green-1); font-style: normal; text-decoration: underline wavy var(--green-3) 2px; text-underline-offset: 4px; }
+
+  p.subtitle {
+    color: var(--brown-3);
+    margin: 12px 0 28px;
+    font-size: 14px;
+    line-height: 1.55;
+    font-weight: 500;
+    max-width: 46ch;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--green-1);
+  }
+  label::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--green-3);
+    border: 1.5px solid var(--brown-1);
+    border-radius: 2px;
+    display: inline-block;
+    transform: rotate(45deg);
+  }
+
+  .field { margin-bottom: 20px; }
+
+  select, textarea {
+    width: 100%;
+    padding: 14px 15px;
+    border-radius: 14px;
+    border: 2.5px solid var(--brown-1);
+    background: var(--beige);
+    color: var(--ink);
+    font-size: 14.5px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 3px 3px 0px 0px rgba(59,42,30,0.35);
+  }
+
+  select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--green-1);
+    background: #fffaf0;
+    box-shadow: 4px 4px 0px 0px var(--green-1);
+    transform: translate(-1px,-1px);
+  }
+
+  textarea { resize: vertical; min-height: 108px; line-height: 1.55; }
+
+  select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--brown-2) 50%), linear-gradient(135deg, var(--brown-2) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+  }
+
+  button#checkBtn {
+    margin-top: 6px;
+    width: 100%;
+    padding: 17px;
+    border: 3px solid var(--brown-1);
+    border-radius: 999px;
+    background: var(--green-1);
+    color: var(--paper);
+    font-size: 15.5px;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 5px 5px 0px 0px var(--brown-1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.25s ease;
+  }
+  button#checkBtn:hover:not(:disabled) {
+    background: var(--green-2);
+    transform: translate(-2px,-2px);
+    box-shadow: 7px 7px 0px 0px var(--brown-1);
+  }
+  button#checkBtn:active:not(:disabled) {
+    transform: translate(2px,2px);
+    box-shadow: 2px 2px 0px 0px var(--brown-1);
+  }
+  button#checkBtn:disabled { opacity: 0.75; cursor: not-allowed; }
+
+  #result {
+    margin-top: 28px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.4s ease;
+  }
+  #result.show { max-height: 700px; opacity: 1; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 12.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 2.5px solid var(--brown-1);
+    animation: badgePop 0.45s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes badgePop {
+    0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+    100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+  }
+  .badge.scam { background: #f1d9ce; color: var(--danger); box-shadow: 3px 3px 0 var(--brown-1); }
+  .badge.safe { background: #dbe8d3; color: var(--safe); box-shadow: 3px 3px 0 var(--brown-1); }
+  .badge .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+    animation: dotBlink 1.4s ease-in-out infinite;
+  }
+  @keyframes dotBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .confidence-bar-bg {
+    background: var(--beige-2);
+    border: 2px solid var(--brown-1);
+    border-radius: 999px;
+    height: 14px;
+    margin-top: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  .confidence-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: repeating-linear-gradient(135deg, var(--green-1), var(--green-1) 8px, var(--green-2) 8px, var(--green-2) 16px);
+    transition: width 0.9s cubic-bezier(.19,1,.22,1);
+    position: relative;
+  }
+
+  #confText {
+    margin-top: 9px;
+    font-size: 12.5px;
+    color: var(--brown-2);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .explanation {
+    margin-top: 22px;
+    background: var(--beige-2);
+    border: 2.5px dashed var(--brown-2);
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 13.5px;
+    color: var(--brown-1);
+    line-height: 1.65;
+    font-weight: 500;
+    animation: fadeUp 0.5s ease 0.15s both;
+    position: relative;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .explanation strong {
+    color: var(--green-1);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+
+  .feature-list { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .feature-chip {
+    background: var(--paper);
+    border: 2px solid var(--green-1);
+    color: var(--green-1);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    animation: chipIn 0.4s ease both;
+  }
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.8) rotate(-4deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+  }
+
+  .note {
+    margin-top: 24px;
+    font-size: 11.5px;
+    color: var(--brown-3);
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .note .ping {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green-2);
+    box-shadow: 0 0 0 0 rgba(79,115,88,0.6);
+    animation: ping 2s infinite;
+  }
+  @keyframes ping {
+    0% { box-shadow: 0 0 0 0 rgba(79,115,88,0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(79,115,88,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,115,88,0); }
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 15px; height: 15px;
+    border: 3px solid rgba(251,243,230,0.5);
+    border-top-color: var(--paper);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob leaf1">
+  <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 5 C80 20 95 55 85 90 C75 120 50 135 50 135 C50 135 25 120 15 90 C5 55 20 20 50 5 Z" fill="#4f7358" opacity="0.55"/>
+    <path d="M50 15 L50 130" stroke="#3b2a1e" stroke-width="2" opacity="0.4"/>
+  </svg>
+</div>
+<div class="blob leaf2">
+  <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 5 C80 20 95 55 85 90 C75 120 50 135 50 135 C50 135 25 120 15 90 C5 55 20 20 50 5 Z" fill="#8a6a4a" opacity="0.4"/>
+    <path d="M50 15 L50 130" stroke="#3b2a1e" stroke-width="2" opacity="0.35"/>
+  </svg>
+</div>
+<div class="blob ring">
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="42" stroke="#3b2a1e" stroke-width="3" stroke-dasharray="10 8"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="tape"></div>
+    <div class="brand">
+      <div class="icon">🛡️</div>
+      <h1>Scam &amp; Fraud <span class="accent">Detection</span></h1>
+    </div>
+    <p class="subtitle">Drop in a message, SMS, URL, or transaction description — get an honest, plain-language read on how risky it looks.</p>
+
+    <div class="field">
+      <label for="inputType">Input type</label>
+      <select id="inputType">
+        <option value="text">Text / SMS message</option>
+        <option value="url">URL</option>
+        <option value="tabular">Transaction (tabular)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="userInput">Content</label>
+      <textarea id="userInput" placeholder="e.g. Congratulations! You've won a $1000 gift card. Click here to claim now: bit.ly/claim-now"></textarea>
+    </div>
+
+    <button id="checkBtn" onclick="runCheck()">Check for Scam</button>
+
+    <div id="result">
+      <div id="badgeRow"></div>
+      <div class="confidence-bar-bg">
+        <div class="confidence-bar-fill" id="confBar"></div>
+      </div>
+      <div id="confText"></div>
+
+      <div class="explanation">
+        <strong>Why</strong>
+        <div id="explanationText" style="margin-top:9px;"></div>
+        <div class="feature-list" id="featureList"></div>
+      </div>
+    </div>
+
+    <p class="note"><span class="ping"></span> Demo mode — showing sample output</p>
+  </div>
+</div>
+
+<script>
+function fakePredict(inputType, text) {
+  const lower = text.toLowerCase();
+  const scamKeywords = ["win", "won", "click", "urgent", "verify", "gift card", "free", "prize", "limited", "act now", "bit.ly", "otp", "bank account"];
+  const hits = scamKeywords.filter(k => lower.includes(k));
+
+  const isScam = hits.length > 0 || Math.random() > 0.5;
+  const confidence = isScam
+    ? 0.72 + Math.random() * 0.25
+    : 0.65 + Math.random() * 0.3;
+
+  const explanations = {
+    text: isScam
+      ? "The message uses urgency and reward-based language commonly seen in phishing and scam texts."
+      : "The message reads as conversational and doesn't contain common scam trigger phrases.",
+    url: isScam
+      ? "The URL structure resembles known phishing patterns (shortened link, suspicious domain, no HTTPS)."
+      : "The URL structure and domain reputation appear consistent with legitimate sites.",
+    tabular: isScam
+      ? "The transaction amount and timing deviate significantly from the account's typical behavior."
+      : "The transaction falls within normal spending patterns for this account."
+  };
+
+  const features = hits.length > 0
+    ? hits.slice(0, 5)
+    : (inputType === "url" ? ["domain_age", "ssl_valid", "path_length"] : ["message_length", "sentiment_score", "link_count"]);
+
+  return {
+    prediction: isScam ? "scam" : "safe",
+    confidence: confidence,
+    explanation: explanations[inputType] || explanations.text,
+    features: features
+  };
+}
+
+function runCheck() {
+  const btn = document.getElementById('checkBtn');
+  const inputType = document.getElementById('inputType').value;
+  const text = document.getElementById('userInput').value.trim();
+
+  if (!text) {
+    const ta = document.getElementById('userInput');
+    ta.style.borderColor = 'var(--danger)';
+    ta.placeholder = "Please enter some content first...";
+    setTimeout(() => { ta.style.borderColor = ''; }, 1200);
+    return;
+  }
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.classList.remove('show');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+  setTimeout(() => {
+    const result = fakePredict(inputType, text);
+    showResult(result);
+    btn.disabled = false;
+    btn.innerHTML = "Check for Scam";
+  }, 900);
+}
+
+function showResult(result) {
+  const resultDiv = document.getElementById('result');
+  const badgeRow = document.getElementById('badgeRow');
+  const confBar = document.getElementById('confBar');
+  const confText = document.getElementById('confText');
+  const explanationText = document.getElementById('explanationText');
+  const featureList = document.getElementById('featureList');
+
+  const isScam = result.prediction === 'scam';
+  badgeRow.innerHTML = `<span class="badge ${isScam ? 'scam' : 'safe'}"><span class="dot"></span>${isScam ? 'LIKELY SCAM' : 'LOOKS SAFE'}</span>`;
+
+  confBar.style.width = '0%';
+  explanationText.textContent = result.explanation;
+
+  featureList.innerHTML = '';
+  result.features.forEach((f, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'feature-chip';
+    chip.textContent = f;
+    chip.style.animationDelay = (i * 0.06) + 's';
+    featureList.appendChild(chip);
+  });
+
+  resultDiv.classList.add('show');
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const pct = Math.round(result.confidence * 100);
+      confBar.style.width = pct + '%';
+      confText.textContent = `Confidence: ${pct}%`;
+    }, 80);
+  });
+}
+
+/*
+---- To connect to your real FastAPI backend later ----
+Replace fakePredict()'s call site in runCheck() with something like:
+
+async function realPredict(inputType, text) {
+  const res = await fetch('http://localhost:8000/api/predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: inputType, content: text })
+  });
+  if (!res.ok) throw new Error('API error');
+  return await res.json();
+}
+*/
+</script>
+
+</body>
+</html>
